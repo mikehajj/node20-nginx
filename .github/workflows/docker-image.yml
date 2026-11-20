@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: |
+        docker build . \
+          --tag mikehajj/node20-nginx:latest \
+          --tag mikehajj/node20-nginx:20.19 \
+          --tag mikehajj/node20-nginx:20
+    - name: Login to Docker
+      run: docker login --username mikehajj --password $docker_pwd
+      env: 
+        docker_pwd: ${{ secrets.DOCKER_PWD }}
+    - name: Push Image to Docker Hub
+      run: |
+        docker push mikehajj/node20-nginx:latest
+        docker push mikehajj/node20-nginx:20.19
+        docker push mikehajj/node20-nginx:20
